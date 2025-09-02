@@ -82,6 +82,22 @@ parse_args() {
     fi
 }
 
+# Загрузка вспомогательных скриптов в $INSTALL_DIR/scripts
+fetch_scripts() {
+    log_info "Загружаем служебные скрипты..."
+    mkdir -p "$INSTALL_DIR/scripts"
+
+    local base_url="https://raw.githubusercontent.com/Stepan163s/qdynn-server/main/scripts"
+    curl -fsSL "$base_url/cli-functions.sh" -o "$INSTALL_DIR/scripts/cli-functions.sh" $QUIET || \
+        log_error "Не удалось скачать cli-functions.sh"
+    curl -fsSL "$base_url/create-scripts.sh" -o "$INSTALL_DIR/scripts/create-scripts.sh" $QUIET || \
+        log_error "Не удалось скачать create-scripts.sh"
+
+    chmod +x "$INSTALL_DIR/scripts/create-scripts.sh"
+    chown -R qdynn:qdynn "$INSTALL_DIR/scripts"
+    log_success "Служебные скрипты загружены"
+}
+
 # Проверка и установка Go (если отсутствует или версия ниже минимальной)
 ensure_go() {
     local has_go=0
@@ -394,6 +410,7 @@ main() {
     ensure_go
     setup_directories
     install_dnstt
+    fetch_scripts
     create_cli
     create_service
     generate_config
