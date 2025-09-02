@@ -20,6 +20,10 @@ CYAN='\033[0;36m'
 WHITE='\033[1;37m'
 NC='\033[0m'
 
+# Минимальная и целевая версии Go
+GO_MIN_VERSION="1.21.0"
+GO_INSTALL_VERSION="1.22.5"
+
 log_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
 }
@@ -41,6 +45,65 @@ log_header() {
     echo -e "\n${PURPLE}▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓${NC}"
     echo -e "${WHITE}  🔄 QDYNN-SERVER v$VERSION - Обновление системы${NC}"
     echo -e "${PURPLE}▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓${NC}\n"
+}
+
+# Проверка прав и установка Go при необходимости
+ensure_go() {
+    local has_go=0
+    local current_ver=""
+    if command -v go >/dev/null 2>&1; then
+        has_go=1
+        current_ver=$(go version | awk '{print $3}' | sed 's/^go//')
+    fi
+
+    if [[ "$has_go" -eq 1 ]]; then
+        if dpkg --compare-versions "$current_ver" ge "$GO_MIN_VERSION"; then
+            log_success "Go найден: версия $current_ver (достаточно)"
+            return 0
+        else
+            log_warning "Обнаружен Go $current_ver (< $GO_MIN_VERSION). Выполняем обновление..."
+        fi
+    else
+        log_info "Go не найден. Устанавливаем Go $GO_INSTALL_VERSION..."
+    fi
+
+    install_go
+}
+
+install_go() {
+    local arch
+    case "$(uname -m)" in
+        x86_64|amd64)
+            arch="amd64" ;;
+        aarch64|arm64)
+            arch="arm64" ;;
+        *)
+            log_error "Неподдерживаемая архитектура: $(uname -m). Поддерживаются amd64 и arm64."
+            ;;
+    esac
+
+    local tar_name="go${GO_INSTALL_VERSION}.linux-${arch}.tar.gz"
+    local url="https://go.dev/dl/${tar_name}"
+    log_info "Скачиваем Go ${GO_INSTALL_VERSION} (${arch})..."
+    curl -fsSL "$url" -o "/tmp/${tar_name}" || log_error "Не удалось скачать ${url}"
+
+    log_info "Устанавливаем Go в /usr/local ..."
+    rm -rf /usr/local/go
+    tar -C /usr/local -xzf "/tmp/${tar_name}" >/dev/null 2>&1 || true
+    ln -sf /usr/local/go/bin/go /usr/local/bin/go
+    ln -sf /usr/local/go/bin/gofmt /usr/local/bin/gofmt
+
+    cat > /etc/profile.d/go.sh << 'EOF'
+export PATH="$PATH:/usr/local/go/bin"
+EOF
+
+    if command -v go >/dev/null 2>&1; then
+        local new_ver
+        new_ver=$(go version | awk '{print $3}' | sed 's/^go//')
+        log_success "Go установлен: версия ${new_ver}"
+    else
+        log_error "Go не найден после установки"
+    fi
 }
 
 # Проверка прав root
@@ -266,6 +329,7 @@ main() {
     check_root
     create_backup
     stop_service
+    ensure_go
     update_dnstt
     update_scripts
     update_cli
