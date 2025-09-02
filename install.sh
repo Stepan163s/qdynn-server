@@ -22,6 +22,13 @@ CYAN='\033[0;36m'
 WHITE='\033[1;37m'
 NC='\033[0m' # No Color
 
+# Настройки отладки
+# Включить: curl -fsSL .../install.sh | sudo bash -s -- --debug
+# Или экспортировать QDYNN_DEBUG=1
+IS_DEBUG=0
+# В обычном режиме подавляем шумный вывод команд
+QUIET="> /dev/null 2>&1"
+
 # Функция для красивого логирования
 log_info() {
     echo -e "${BLUE}[INFO]${NC} $1"
@@ -45,6 +52,30 @@ log_header() {
     echo -e "${WHITE}  🚀 QDYNN-SERVER v$VERSION - Автоматическая установка${NC}"
     echo -e "${CYAN}     Ядро: DNSTT Server от David Fifield (bamsoftware.com)${NC}"
     echo -e "${PURPLE}▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓${NC}\n"
+}
+
+# Разбор флагов CLI и включение режима отладки при необходимости
+parse_args() {
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --debug|-d)
+                IS_DEBUG=1
+                ;;
+        esac
+        shift
+    done
+
+    if [[ -n "${QDYNN_DEBUG:-}" ]] || { [[ -n "${DEBUG:-}" ]] && [[ "${DEBUG}" != "0" ]]; }; then
+        IS_DEBUG=1
+    fi
+
+    if [[ "$IS_DEBUG" -eq 1 ]]; then
+        QUIET=""
+        set -o pipefail
+        set -x
+        echo -e "${YELLOW}[⚠]${NC} DEBUG режим включен: вывод команд и ошибок не подавляется"
+        trap 'echo -e "${RED}[✗]${NC} Ошибка на строке $LINENO: команда: ${BASH_COMMAND}"' ERR
+    fi
 }
 
 # Проверка прав root
@@ -76,7 +107,7 @@ detect_os() {
 install_dependencies() {
     log_info "Обновляем систему и устанавливаем зависимости..."
     
-    apt-get update -q > /dev/null 2>&1
+    apt-get update -q $QUIET
     apt-get install -y \
         curl \
         wget \
@@ -90,7 +121,7 @@ install_dependencies() {
         jq \
         qrencode \
         unzip \
-        > /dev/null 2>&1
+        $QUIET
         
     log_success "Зависимости установлены"
 }
@@ -122,11 +153,15 @@ install_dnstt() {
     log_info "Скачиваем и компилируем DNSTT..."
     
     cd /tmp
-    git clone https://www.bamsoftware.com/git/dnstt.git > /dev/null 2>&1
+    git clone https://www.bamsoftware.com/git/dnstt.git $QUIET
     cd dnstt
     
     # Компилируем сервер
-    go build -o dnstt-server ./dnstt-server > /dev/null 2>&1
+    local go_build_flags=""
+    if [[ "$IS_DEBUG" -eq 1 ]]; then
+        go_build_flags="-v"
+    fi
+    GO111MODULE=on go build ${go_build_flags} -o dnstt-server ./dnstt-server $QUIET
     
     # Копируем в установочную директорию
     cp dnstt-server $INSTALL_DIR/bin/
@@ -215,7 +250,7 @@ WantedBy=multi-user.target
 EOF
     
     systemctl daemon-reload
-    systemctl enable $SERVICE_NAME > /dev/null 2>&1
+    systemctl enable $SERVICE_NAME $QUIET
     
     log_success "Systemd сервис создан и активирован"
 }
@@ -278,6 +313,7 @@ finalize_installation() {
 
 # Главная функция
 main() {
+    parse_args "$@"
     log_header
     check_root
     detect_os
