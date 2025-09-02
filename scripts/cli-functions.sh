@@ -161,7 +161,12 @@ generate_qr_code() {
 
 # Показать логи
 show_logs() {
-    local lines=${1:-50}
+    local arg=${1:-50}
+    if [[ "$arg" == "clear" ]]; then
+        clear_logs
+        return 0
+    fi
+    local lines="$arg"
     show_banner
     
     echo -e "${CYAN}════════════ ЛОГИ СЕРВЕРА (последние $lines строк) ═══════════=${NC}\n"
@@ -170,6 +175,33 @@ show_logs() {
         journalctl -u $SERVICE_NAME -n $lines --no-pager -f
     else
         journalctl -u $SERVICE_NAME -n $lines --no-pager
+    fi
+}
+
+# Очистка/ротация логов вручную
+clear_logs() {
+    show_banner
+    log_info "Останавливаем сервис для очистки логов..."
+    systemctl stop $SERVICE_NAME 2>/dev/null || true
+    
+    local ts
+    ts=$(date +%Y%m%d-%H%M%S)
+    mkdir -p "$LOG_DIR"
+    for f in dnstt.log server.log monitor.log update.log; do
+        if [[ -s "$LOG_DIR/$f" ]]; then
+            mv "$LOG_DIR/$f" "$LOG_DIR/${f%.log}-$ts.log"
+        fi
+        : > "$LOG_DIR/$f"
+    done
+    find "$LOG_DIR" -type f -name "*-*.log" -mtime +14 -delete 2>/dev/null || true
+    log_success "Логи очищены"
+    
+    log_info "Запускаем сервис..."
+    systemctl start $SERVICE_NAME 2>/dev/null || true
+    if systemctl is-active --quiet $SERVICE_NAME; then
+        log_success "Сервис запущен"
+    else
+        log_warning "Сервис не запустился, проверьте: qdynn logs"
     fi
 }
 
@@ -217,9 +249,9 @@ set_domain() {
     sed -i "s/SERVER_DOMAIN=.*/SERVER_DOMAIN=\"$domain\"/" $CONFIG_DIR/server.conf
     
     log_success "Домен установлен: $domain"
-    log_info "Не забудьте создать DNS записи:"
-    echo -e "  ${YELLOW}ns.$domain${NC}    A    $(curl -s ifconfig.me)"
-    echo -e "  ${YELLOW}*.$domain${NC}     NS   ns.$domain"
+    log_info "Не забудьте создать DNS записи:";
+    echo -e "  ${YELLOW}ns.$domain${NC}    A     $(curl -s ifconfig.me)"
+    echo -e "  ${YELLOW}$domain${NC}       NS    ns.$domain"
 }
 
 # Управление клиентами
@@ -281,6 +313,7 @@ show_help() {
     
     echo -e "${CYAN}📊 МОНИТОРИНГ:${NC}"
     echo -e "  ${GREEN}logs${NC} [количество]        Показать логи (по умолчанию: 50 строк)"
+    echo -e "  ${GREEN}logs clear${NC}              Очистить текущие логи с ротацией"
     echo -e ""
     
     echo -e "${CYAN}⚙️ НАСТРОЙКА:${NC}"
