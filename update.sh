@@ -6,7 +6,7 @@ set -e
 VERSION="1.0.0"
 INSTALL_DIR="/opt/qdynn-server"
 CONFIG_DIR="/etc/qdynn"
-LOG_DIR="/var/log/qdynn"
+LOG_DIR="/opt/qdynn-server/logs"
 SERVICE_NAME="qdynn-server"
 BACKUP_DIR="/tmp/qdynn-backup-$(date +%Y%m%d-%H%M%S)"
 
@@ -216,7 +216,7 @@ update_cli() {
 VERSION="1.0.0"
 INSTALL_DIR="/opt/qdynn-server"
 CONFIG_DIR="/etc/qdynn" 
-LOG_DIR="/var/log/qdynn"
+LOG_DIR="/opt/qdynn-server/logs"
 SERVICE_NAME="qdynn-server"
 
 # Цвета

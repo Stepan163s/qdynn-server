@@ -3,7 +3,7 @@
 
 INSTALL_DIR="/opt/qdynn-server"
 CONFIG_DIR="/etc/qdynn"
-LOG_DIR="/var/log/qdynn"
+LOG_DIR="$INSTALL_DIR/logs"
 
 # Скрипт запуска DNSTT сервера
 cat > $INSTALL_DIR/scripts/start-server.sh << 'EOF'
@@ -12,7 +12,7 @@ cat > $INSTALL_DIR/scripts/start-server.sh << 'EOF'
 
 INSTALL_DIR="/opt/qdynn-server"
 CONFIG_DIR="/etc/qdynn"
-LOG_DIR="/var/log/qdynn"
+LOG_DIR="/opt/qdynn-server/logs"
 PID_FILE="$INSTALL_DIR/run/qdynn-server.pid"
 
 # Загружаем конфигурацию
@@ -76,7 +76,7 @@ cat > $INSTALL_DIR/scripts/stop-server.sh << 'EOF'
 #!/bin/bash
 # QDYNN-SERVER Stop Script
 
-LOG_DIR="/var/log/qdynn"
+LOG_DIR="/opt/qdynn-server/logs"
 PID_FILE="/opt/qdynn-server/run/qdynn-server.pid"
 
 # Функция логирования

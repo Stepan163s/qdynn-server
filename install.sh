@@ -9,7 +9,7 @@ REPO_URL="https://github.com/Stepan163s/qdynn-server"
 INSTALL_DIR="/opt/qdynn-server"
 BIN_DIR="/usr/local/bin"
 CONFIG_DIR="/etc/qdynn"
-LOG_DIR="/var/log/qdynn"
+LOG_DIR="/opt/qdynn-server/logs"
 SERVICE_NAME="qdynn-server"
 
 # Цвета для красивого вывода
@@ -109,7 +109,7 @@ generate_runtime_scripts() {
 
 INSTALL_DIR="/opt/qdynn-server"
 CONFIG_DIR="/etc/qdynn"
-LOG_DIR="/var/log/qdynn"
+LOG_DIR="/opt/qdynn-server/logs"
 PID_FILE="$INSTALL_DIR/run/qdynn-server.pid"
 
 # Загружаем конфигурацию
@@ -164,7 +164,7 @@ EOF
 #!/bin/bash
 # QDYNN-SERVER Stop Script
 
-LOG_DIR="/var/log/qdynn"
+LOG_DIR="/opt/qdynn-server/logs"
 PID_FILE="/opt/qdynn-server/run/qdynn-server.pid"
 
 log() {
@@ -488,9 +488,6 @@ NoNewPrivileges=yes
 ProtectSystem=strict
 ProtectHome=yes
 ReadWritePaths=$CONFIG_DIR $LOG_DIR $INSTALL_DIR
-
-# Автосоздание каталога логов /var/log/qdynn c владельцем qdynn
-LogsDirectory=qdynn
 
 [Install]
 WantedBy=multi-user.target
