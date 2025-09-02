@@ -218,6 +218,11 @@ install_dnstt() {
     log_info "Скачиваем и компилируем DNSTT..."
     
     cd /tmp
+    # Если каталог уже существует (повторная установка) — удаляем
+    if [[ -d "dnstt" ]]; then
+        log_warning "Обнаружена существующая директория dnstt. Удаляем..."
+        rm -rf dnstt
+    fi
     git clone https://www.bamsoftware.com/git/dnstt.git $QUIET
     cd dnstt
     

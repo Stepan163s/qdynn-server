@@ -154,6 +154,11 @@ update_dnstt() {
     log_info "Обновляем DNSTT до последней версии..."
     
     cd /tmp
+    # Удаляем старую директорию, если осталась от предыдущего запуска
+    if [[ -d "dnstt-update" ]]; then
+        log_warning "Обнаружена существующая директория dnstt-update. Удаляем..."
+        rm -rf dnstt-update
+    fi
     git clone https://www.bamsoftware.com/git/dnstt.git dnstt-update > /dev/null 2>&1
     cd dnstt-update
     
