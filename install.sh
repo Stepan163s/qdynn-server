@@ -226,15 +226,18 @@ install_dnstt() {
     git clone https://www.bamsoftware.com/git/dnstt.git $QUIET
     cd dnstt
     
-    # Компилируем сервер
+    # Компилируем сервер (выводим бинарник с другим именем, чтобы не путать с каталогом)
     local go_build_flags=""
     if [[ "$IS_DEBUG" -eq 1 ]]; then
         go_build_flags="-v"
     fi
-    GO111MODULE=on go build ${go_build_flags} -o dnstt-server ./dnstt-server $QUIET
+    GO111MODULE=on go build ${go_build_flags} -o dnstt-server.bin ./dnstt-server $QUIET
+    if [[ ! -f dnstt-server.bin ]]; then
+        log_error "Сборка DNSTT не удалась: бинарник не найден. Запустите установку с --debug для подробностей."
+    fi
     
     # Копируем в установочную директорию
-    cp dnstt-server $INSTALL_DIR/bin/
+    cp dnstt-server.bin $INSTALL_DIR/bin/dnstt-server
     chmod +x $INSTALL_DIR/bin/dnstt-server
     
     # Очищаем временные файлы

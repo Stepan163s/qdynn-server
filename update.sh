@@ -162,11 +162,14 @@ update_dnstt() {
     git clone https://www.bamsoftware.com/git/dnstt.git dnstt-update > /dev/null 2>&1
     cd dnstt-update
     
-    # Компилируем новую версию
-    go build -o dnstt-server ./dnstt-server > /dev/null 2>&1
+    # Компилируем новую версию (имя файла, чтобы не конфликтовать с каталогом)
+    go build -o dnstt-server.bin ./dnstt-server > /dev/null 2>&1
+    if [[ ! -f dnstt-server.bin ]]; then
+        log_error "Сборка DNSTT не удалась: бинарник не найден"
+    fi
     
     # Заменяем старую версию
-    cp dnstt-server $INSTALL_DIR/bin/
+    cp dnstt-server.bin $INSTALL_DIR/bin/dnstt-server
     chmod +x $INSTALL_DIR/bin/dnstt-server
     
     # Очищаем временные файлы
