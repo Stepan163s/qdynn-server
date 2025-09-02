@@ -208,9 +208,41 @@ update_scripts() {
 update_cli() {
     log_info "Обновляем CLI интерфейс..."
     
-    # Скачиваем новую версию CLI wrapper
-    curl -fsSL "https://raw.githubusercontent.com/Stepan163s/qdynn-server/main/qdynn-cli" \
-         -o /usr/local/bin/qdynn
+    # Генерируем CLI локально, как в install.sh
+    cat > /usr/local/bin/qdynn << 'EOF'
+#!/bin/bash
+# QDYNN-SERVER CLI Interface
+
+VERSION="1.0.0"
+INSTALL_DIR="/opt/qdynn-server"
+CONFIG_DIR="/etc/qdynn" 
+LOG_DIR="/var/log/qdynn"
+SERVICE_NAME="qdynn-server"
+
+# Цвета
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+NC='\033[0m'
+
+source $INSTALL_DIR/scripts/cli-functions.sh
+
+case "$1" in
+    start)     start_server ;;
+    stop)      stop_server ;;
+    restart)   restart_server ;;
+    status)    show_status ;;
+    logs)      show_logs "${2:-50}" ;;
+    config)    configure_server "$2" "$3" ;;
+    clients)   manage_clients "$2" "$3" ;;
+    update)    update_server ;;
+    *)         show_help ;;
+esac
+EOF
     
     chmod +x /usr/local/bin/qdynn
     log_success "CLI обновлен"
