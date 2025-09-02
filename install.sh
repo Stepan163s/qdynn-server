@@ -555,8 +555,10 @@ finalize_installation() {
     
     echo -e "${CYAN}Следующие шаги:${NC}"
     echo -e "1. ${YELLOW}qdynn config domain your-domain.com${NC} - настроить домен"
+    echo -e "   ${WHITE}Пример DNS:${NC} A-запись ${YELLOW}ns.tunnel.example.com${NC} → ${YELLOW}$EXTERNAL_IP${NC}, NS-запись ${YELLOW}tunnel.example.com${NC} → ${YELLOW}ns.tunnel.example.com${NC}"
     echo -e "2. ${YELLOW}qdynn start${NC} - запустить сервер"
-    echo -e "3. ${YELLOW}qdynn status${NC} - получить данные для подключения\n"
+    echo -e "3. ${YELLOW}qdynn status${NC} - получить данные для подключения"
+    echo -e "4. ${YELLOW}qdynn logs${NC} - посмотреть логи (или ${YELLOW}qdynn logs clear${NC} чтобы очистить)\n"
     
     echo -e "${BLUE}Документация:${NC} https://github.com/Stepan163s/qdynn-server"
     echo -e "${BLUE}Поддержка:${NC} https://t.me/qdynn_support\n"
