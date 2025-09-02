@@ -125,6 +125,19 @@ log "Домен: $SERVER_DOMAIN, IP: $EXTERNAL_IP"
 mkdir -p $LOG_DIR/clients
 mkdir -p $INSTALL_DIR/run
 
+rotate_logs() {
+    ts=$(date +%Y%m%d-%H%M%S)
+    for f in dnstt.log server.log monitor.log; do
+        if [[ -s "$LOG_DIR/$f" ]]; then
+            mv "$LOG_DIR/$f" "$LOG_DIR/${f%.log}-$ts.log"
+        fi
+        : > "$LOG_DIR/$f"
+    done
+    find "$LOG_DIR" -type f -name "*-*.log" -mtime +14 -delete 2>/dev/null || true
+}
+
+rotate_logs
+
 cd $INSTALL_DIR
 exec $INSTALL_DIR/bin/dnstt-server \
     -domain "ns.$SERVER_DOMAIN" \

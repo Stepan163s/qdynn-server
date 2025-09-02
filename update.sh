@@ -308,7 +308,17 @@ EOF
 # Запуск сервиса
 start_service() {
     log_info "Запускаем QDYNN Server..."
-    
+
+    # Ротация логов перед запуском, чтобы не было путаницы
+    ts=$(date +%Y%m%d-%H%M%S)
+    for f in dnstt.log server.log monitor.log update.log; do
+        if [[ -s "$LOG_DIR/$f" ]]; then
+            mv "$LOG_DIR/$f" "$LOG_DIR/${f%.log}-$ts.log"
+        fi
+        : > "$LOG_DIR/$f"
+    done
+    find "$LOG_DIR" -type f -name "*-*.log" -mtime +14 -delete 2>/dev/null || true
+
     systemctl daemon-reload
     systemctl start $SERVICE_NAME
     
