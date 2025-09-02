@@ -110,7 +110,7 @@ generate_runtime_scripts() {
 INSTALL_DIR="/opt/qdynn-server"
 CONFIG_DIR="/etc/qdynn"
 LOG_DIR="/var/log/qdynn"
-PID_FILE="/var/run/qdynn-server.pid"
+PID_FILE="$INSTALL_DIR/run/qdynn-server.pid"
 
 # Загружаем конфигурацию
 source $CONFIG_DIR/server.conf
@@ -123,6 +123,7 @@ log "Запускаем QDYNN DNSTT Server..."
 log "Домен: $SERVER_DOMAIN, IP: $EXTERNAL_IP"
 
 mkdir -p $LOG_DIR/clients
+mkdir -p $INSTALL_DIR/run
 
 cd $INSTALL_DIR
 exec $INSTALL_DIR/bin/dnstt-server \
@@ -151,7 +152,7 @@ EOF
 # QDYNN-SERVER Stop Script
 
 LOG_DIR="/var/log/qdynn"
-PID_FILE="/var/run/qdynn-server.pid"
+PID_FILE="/opt/qdynn-server/run/qdynn-server.pid"
 
 log() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] $1" >> $LOG_DIR/server.log
