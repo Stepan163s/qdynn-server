@@ -347,6 +347,7 @@ install_dependencies() {
         git \
         build-essential \
         systemd \
+        xxd \
         certbot \
         python3-certbot-nginx \
         nginx \
@@ -480,10 +481,16 @@ StandardOutput=journal
 StandardError=journal
 
 # Безопасность
+# Разрешаем привязку к низкому порту (53)
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 NoNewPrivileges=yes
 ProtectSystem=strict
 ProtectHome=yes
 ReadWritePaths=$CONFIG_DIR $LOG_DIR $INSTALL_DIR
+
+# Автосоздание каталога логов /var/log/qdynn c владельцем qdynn
+LogsDirectory=qdynn
 
 [Install]
 WantedBy=multi-user.target

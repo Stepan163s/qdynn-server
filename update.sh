@@ -320,6 +320,18 @@ start_service() {
     find "$LOG_DIR" -type f -name "*-*.log" -mtime +14 -delete 2>/dev/null || true
 
     systemctl daemon-reload
+    # Обновляем юнит: даём права на порт 53 и логи
+    if grep -q "ExecStart=/opt/qdynn-server/scripts/start-server.sh" /etc/systemd/system/qdynn-server.service 2>/dev/null; then
+        sed -i 's/^\s*AmbientCapabilities.*/AmbientCapabilities=CAP_NET_BIND_SERVICE/g' /etc/systemd/system/qdynn-server.service 2>/dev/null || true
+        sed -i 's/^\s*CapabilityBoundingSet.*/CapabilityBoundingSet=CAP_NET_BIND_SERVICE/g' /etc/systemd/system/qdynn-server.service 2>/dev/null || true
+        sed -i 's/^\s*LogsDirectory.*/LogsDirectory=qdynn/g' /etc/systemd/system/qdynn-server.service 2>/dev/null || true
+        if ! grep -q '^LogsDirectory=qdynn' /etc/systemd/system/qdynn-server.service 2>/dev/null; then
+            sed -i '/^ReadWritePaths=/a LogsDirectory=qdynn' /etc/systemd/system/qdynn-server.service 2>/dev/null || true
+        fi
+        if ! grep -q '^AmbientCapabilities=CAP_NET_BIND_SERVICE' /etc/systemd/system/qdynn-server.service 2>/dev/null; then
+            sed -i '/^# Безопасность/a AmbientCapabilities=CAP_NET_BIND_SERVICE\nCapabilityBoundingSet=CAP_NET_BIND_SERVICE' /etc/systemd/system/qdynn-server.service 2>/dev/null || true
+        fi
+    fi
     systemctl start $SERVICE_NAME
     
     if systemctl is-active --quiet $SERVICE_NAME; then
