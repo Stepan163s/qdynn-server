@@ -239,6 +239,47 @@ configure_server() {
     esac
 }
 
+# Первичная настройка сервера (без интерактива)
+initial_setup() {
+    show_banner
+    log_info "Первичная настройка..."
+
+    if [[ ! -f "$CONFIG_DIR/server.conf" ]]; then
+        log_error "Конфигурация не найдена! Запустите: qdynn config domain <домен>"
+        return 1
+    fi
+
+    # Загружаем параметры
+    source "$CONFIG_DIR/server.conf"
+
+    # Подсказка по DNS, если домен ещё не поменяли с дефолтного
+    if [[ "$SERVER_DOMAIN" == *"example.com"* ]] || [[ -z "$SERVER_DOMAIN" ]]; then
+        log_warning "Домен не настроен или дефолтный (example.com)."
+        echo -e "  ${YELLOW}Пример DNS:${NC} A ${WHITE}ns.tunnel.example.com${NC} → ${WHITE}$EXTERNAL_IP${NC}"
+        echo -e "  ${YELLOW}Пример DNS:${NC} NS ${WHITE}tunnel.example.com${NC} → ${WHITE}ns.tunnel.example.com${NC}"
+        echo -e "  ${CYAN}Команда:${NC} qdynn config domain tunnel.example.com"
+    else
+        log_info "DNS напоминание:"
+        echo -e "  ${YELLOW}ns.$SERVER_DOMAIN${NC}    A     ${WHITE}$EXTERNAL_IP${NC}"
+        echo -e "  ${YELLOW}$SERVER_DOMAIN${NC}       NS    ${WHITE}ns.$SERVER_DOMAIN${NC}"
+    fi
+
+    # Применяем systemd и запускаем
+    systemctl daemon-reload
+    systemctl enable $SERVICE_NAME >/dev/null 2>&1 || true
+    systemctl restart $SERVICE_NAME || true
+
+    # Итог
+    if systemctl is-active --quiet $SERVICE_NAME; then
+        log_success "Сервис запущен"
+    else
+        log_warning "Сервис не активен. Проверьте логи: qdynn logs"
+    fi
+
+    sleep 1
+    show_status
+}
+
 # Установка домена
 set_domain() {
     local domain=$1
