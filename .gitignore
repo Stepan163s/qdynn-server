@@ -1,0 +1,80 @@
+# Compiled binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+dnstt-server
+dnstt-client
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Go workspace file
+go.work
+
+# Logs
+*.log
+logs/
+/var/log/qdynn/
+
+# Configuration files with sensitive data
+server.conf
+*.key
+*.pem
+*.crt
+
+# Runtime files
+*.pid
+/var/run/qdynn*
+
+# Backup files
+backup-*
+*.backup
+*.bak
+
+# Temporary files
+.tmp/
+/tmp/
+*.tmp
+*~
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Package files
+*.tar.gz
+*.zip
+*.deb
+*.rpm
+
+# Cache directories
+.cache/
+cache/
+
+# SSL certificates
+*.csr
+*.crt
+*.key
+*.pem
+certs/
+
+# Client keys and configs
+clients/
+client-*.json

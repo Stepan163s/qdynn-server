@@ -1,0 +1,87 @@
+# QDYNN Server Configuration Template
+# Этот файл содержит все настройки DNSTT сервера
+
+# === ОСНОВНЫЕ НАСТРОЙКИ ===
+# Домен для туннеля (обязательно настроить DNS записи)
+SERVER_DOMAIN="tunnel.example.com"
+
+# Внешний IP адрес сервера
+EXTERNAL_IP="YOUR_SERVER_IP"
+
+# Порты
+DNS_PORT="53"
+HTTPS_PORT="443"
+
+# === БЕЗОПАСНОСТЬ ===
+# Приватный ключ сервера (32 байта в hex)
+PRIVATE_KEY="GENERATED_PRIVATE_KEY"
+
+# Публичный ключ для клиентов (SHA256 от приватного ключа)
+PUBLIC_KEY="GENERATED_PUBLIC_KEY"
+
+# === ОГРАНИЧЕНИЯ ===
+# Максимальное количество одновременных клиентов
+MAX_CLIENTS="100"
+
+# MTU для туннеля (оптимально 1280 для мобильных сетей)
+MTU="1280"
+
+# Таймаут неактивных соединений (секунды)
+IDLE_TIMEOUT="300"
+
+# === SSL СЕРТИФИКАТЫ ===
+# Автоматическое получение Let's Encrypt сертификатов
+ENABLE_SSL="true"
+
+# Email для Let's Encrypt (для уведомлений)
+SSL_EMAIL="admin@example.com"
+
+# === ЛОГИРОВАНИЕ ===
+# Уровень логирования: DEBUG, INFO, WARNING, ERROR
+LOG_LEVEL="INFO"
+
+# Максимальный размер лог файла (MB)
+MAX_LOG_SIZE="100"
+
+# Количество архивных лог файлов
+LOG_ROTATE_COUNT="5"
+
+# === МОНИТОРИНГ ===
+# Включить мониторинг производительности
+ENABLE_MONITORING="true"
+
+# Интервал сбора статистики (секунды)
+STATS_INTERVAL="60"
+
+# === ОБНОВЛЕНИЯ ===
+# Автоматические обновления
+AUTO_UPDATE="false"
+
+# Проверка обновлений (часы)
+UPDATE_CHECK_INTERVAL="24"
+
+# === ДОПОЛНИТЕЛЬНЫЕ ПАРАМЕТРЫ ===
+# Whitelist IP адресов (через запятую, пустой = все разрешены)
+IP_WHITELIST=""
+
+# Blacklist IP адресов (через запятую)
+IP_BLACKLIST=""
+
+# Максимальная скорость на клиента (Kbps, 0 = неограниченно)
+RATE_LIMIT_PER_CLIENT="0"
+
+# Включить веб-интерфейс для мониторинга
+WEB_INTERFACE="false"
+WEB_INTERFACE_PORT="8080"
+WEB_INTERFACE_PASSWORD="admin123"
+
+# === УВЕДОМЛЕНИЯ ===
+# Telegram бот для уведомлений
+TELEGRAM_BOT_TOKEN=""
+TELEGRAM_CHAT_ID=""
+
+# === РЕЗЕРВНОЕ КОПИРОВАНИЕ ===
+# Автоматическое резервное копирование конфигурации
+AUTO_BACKUP="true"
+BACKUP_INTERVAL="24"  # часы
+BACKUP_RETENTION="7"  # дней

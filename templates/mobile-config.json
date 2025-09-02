@@ -1,0 +1,23 @@
+{
+  "name": "QDYNN Server Connection",
+  "description": "Автоматически сгенерированная конфигурация",
+  "version": "1.0",
+  "transport": "doh",
+  "resolver": "https://cloudflare-dns.com/dns-query",
+  "pubkey": "{{PUBLIC_KEY}}",
+  "domain": "ns.{{SERVER_DOMAIN}}",
+  "local_addr": "127.0.0.1:12345",
+  "settings": {
+    "mtu": 1280,
+    "dns_servers": ["8.8.8.8", "8.8.4.4"],
+    "auto_reconnect": true,
+    "connection_timeout": 10,
+    "keep_alive": true
+  },
+  "server_info": {
+    "name": "QDYNN Server",
+    "location": "{{SERVER_LOCATION}}",
+    "admin_contact": "{{ADMIN_EMAIL}}",
+    "setup_date": "{{SETUP_DATE}}"
+  }
+}
