@@ -5,7 +5,7 @@ set -e
 # Разворачивает DNSTT туннель-сервер одной командой
 
 VERSION="1.0.0"
-REPO_URL="https://github.com/stepan163/qdynn-server"
+REPO_URL="https://github.com/Stepan163s/qdynn-server"
 INSTALL_DIR="/opt/qdynn-server"
 BIN_DIR="/usr/local/bin"
 CONFIG_DIR="/etc/qdynn"
@@ -272,7 +272,7 @@ finalize_installation() {
     echo -e "2. ${YELLOW}qdynn start${NC} - запустить сервер"
     echo -e "3. ${YELLOW}qdynn status${NC} - получить данные для подключения\n"
     
-    echo -e "${BLUE}Документация:${NC} https://github.com/stepan163/qdynn-server"
+    echo -e "${BLUE}Документация:${NC} https://github.com/Stepan163s/qdynn-server"
     echo -e "${BLUE}Поддержка:${NC} https://t.me/qdynn_support\n"
 }
 

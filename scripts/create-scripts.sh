@@ -154,7 +154,7 @@ cat > $INSTALL_DIR/scripts/update.sh << 'EOF'
 #!/bin/bash
 # QDYNN-SERVER Update Script
 
-REPO_URL="https://api.github.com/repos/stepan163/qdynn-server/releases/latest"
+REPO_URL="https://api.github.com/repos/Stepan163s/qdynn-server/releases/latest"
 INSTALL_DIR="/opt/qdynn-server"
 LOG_DIR="/var/log/qdynn"
 
@@ -172,7 +172,7 @@ if [[ "$LATEST_VERSION" != "$CURRENT_VERSION" ]] && [[ "$LATEST_VERSION" != "unk
     log "Доступна новая версия: $LATEST_VERSION (текущая: $CURRENT_VERSION)"
     
     # Скачиваем и запускаем скрипт обновления
-    curl -fsSL https://raw.githubusercontent.com/stepan163/qdynn-server/main/update.sh | bash
+    curl -fsSL https://raw.githubusercontent.com/Stepan163s/qdynn-server/main/update.sh | bash
 else
     log "Обновлений не найдено (версия: $CURRENT_VERSION)"
 fi

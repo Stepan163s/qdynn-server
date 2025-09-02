@@ -263,7 +263,7 @@ update_server() {
     log_info "Проверяем обновления..."
     
     # Скачиваем и запускаем обновленный установщик
-    curl -fsSL https://raw.githubusercontent.com/stepan163/qdynn-server/main/update.sh | bash
+    curl -fsSL https://raw.githubusercontent.com/Stepan163s/qdynn-server/main/update.sh | bash
 }
 
 # Помощь
@@ -300,7 +300,7 @@ show_help() {
     echo -e "  ${GREEN}update${NC}                   Обновить до последней версии"
     echo -e ""
     
-    echo -e "${BLUE}📚 Документация:${NC} https://github.com/stepan163/qdynn-server"
+    echo -e "${BLUE}📚 Документация:${NC} https://github.com/Stepan163s/qdynn-server"
     echo -e "${BLUE}💬 Поддержка:${NC}    https://t.me/qdynn_support"
     echo -e ""
 }

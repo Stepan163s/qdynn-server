@@ -103,7 +103,7 @@ deploy: ## Деплой на GitHub Releases
 		https://api.github.com/repos/stepan163/qdynn-server/releases \
 		-d '{"tag_name":"v$(VERSION)","name":"QDYNN-SERVER v$(VERSION)","body":"См. CHANGELOG.md для деталей","draft":false,"prerelease":false}'
 	
-	@echo "✅ Релиз создан: https://github.com/stepan163/qdynn-server/releases/tag/v$(VERSION)"
+	@echo "✅ Релиз создан: https://github.com/Stepan163s/qdynn-server/releases/tag/v$(VERSION)"
 
 status: ## Показать статус установленного сервера
 	@if command -v qdynn >/dev/null 2>&1; then \
@@ -135,7 +135,7 @@ info: ## Показать информацию о проекте
 	@echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	@echo "📅 Время сборки: $(BUILD_TIME)"
 	@echo "📝 Git commit:   $(GIT_COMMIT)"
-	@echo "🌐 Repository:   https://github.com/stepan163/qdynn-server"
+	@echo "🌐 Repository:   https://github.com/Stepan163s/qdynn-server"
 	@echo "📱 Mobile App:   https://github.com/stepan163/qdynn"
 	@echo "📧 Support:      https://t.me/qdynn_support"
 	@echo ""

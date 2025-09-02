@@ -9,7 +9,7 @@
 ## ⚡ Быстрый старт
 ```bash
 # Автоматическая установка одной командой
-curl -fsSL https://raw.githubusercontent.com/stepan163/qdynn-server/main/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/Stepan163s/qdynn-server/main/install.sh | sudo bash
 
 # Запуск сервера
 sudo qdynn start

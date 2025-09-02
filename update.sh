@@ -117,9 +117,9 @@ update_scripts() {
     mkdir -p $temp_dir
     
     # GitHub Raw URLs для скриптов
-    curl -fsSL "https://raw.githubusercontent.com/stepan163/qdynn-server/main/scripts/cli-functions.sh" \
+    curl -fsSL "https://raw.githubusercontent.com/Stepan163s/qdynn-server/main/scripts/cli-functions.sh" \
          -o $temp_dir/cli-functions.sh
-    curl -fsSL "https://raw.githubusercontent.com/stepan163/qdynn-server/main/scripts/create-scripts.sh" \
+    curl -fsSL "https://raw.githubusercontent.com/Stepan163s/qdynn-server/main/scripts/create-scripts.sh" \
          -o $temp_dir/create-scripts.sh
     
     # Обновляем скрипты
@@ -138,7 +138,7 @@ update_cli() {
     log_info "Обновляем CLI интерфейс..."
     
     # Скачиваем новую версию CLI wrapper
-    curl -fsSL "https://raw.githubusercontent.com/stepan163/qdynn-server/main/qdynn-cli" \
+    curl -fsSL "https://raw.githubusercontent.com/Stepan163s/qdynn-server/main/qdynn-cli" \
          -o /usr/local/bin/qdynn
     
     chmod +x /usr/local/bin/qdynn
@@ -155,7 +155,7 @@ update_config() {
         local temp_config="/tmp/server.conf.new"
         
         # Скачиваем новый шаблон
-        curl -fsSL "https://raw.githubusercontent.com/stepan163/qdynn-server/main/configs/server.conf.template" \
+        curl -fsSL "https://raw.githubusercontent.com/Stepan163s/qdynn-server/main/configs/server.conf.template" \
              -o $temp_config
         
         # Переносим старые значения

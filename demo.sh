@@ -55,7 +55,7 @@ done
 echo -e "\n${CYAN}📦 Готовые команды для пользователя:${NC}"
 echo -e ""
 echo -e "${WHITE}# Автоматическая установка одной командой:${NC}"
-echo -e "${YELLOW}curl -fsSL https://raw.githubusercontent.com/stepan163/qdynn-server/main/install.sh | sudo bash${NC}"
+echo -e "${YELLOW}curl -fsSL https://raw.githubusercontent.com/Stepan163s/qdynn-server/main/install.sh | sudo bash${NC}"
 echo -e ""
 echo -e "${WHITE}# Управление сервером:${NC}"
 echo -e "${YELLOW}sudo qdynn start${NC}     # Запуск"
@@ -65,7 +65,7 @@ echo -e "${YELLOW}qdynn config domain tunnel.example.com${NC}  # Настрой�
 echo -e ""
 
 echo -e "${BLUE}🌐 GitHub Repository:${NC}"
-echo -e "https://github.com/stepan163/qdynn-server"
+echo -e "https://github.com/Stepan163s/qdynn-server"
 echo -e ""
 
 echo -e "${GREEN}📱 Интеграция с мобильным приложением:${NC}"
