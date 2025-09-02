@@ -98,6 +98,143 @@ fetch_scripts() {
     log_success "Служебные скрипты загружены"
 }
 
+# Резервная генерация скриптов (если create-scripts.sh недоступен)
+generate_runtime_scripts() {
+    log_warning "create-scripts.sh недоступен. Генерируем скрипты локально..."
+    mkdir -p "$INSTALL_DIR/scripts"
+
+    cat > $INSTALL_DIR/scripts/start-server.sh << 'EOF'
+#!/bin/bash
+# QDYNN-SERVER Start Script
+
+INSTALL_DIR="/opt/qdynn-server"
+CONFIG_DIR="/etc/qdynn"
+LOG_DIR="/var/log/qdynn"
+PID_FILE="/var/run/qdynn-server.pid"
+
+# Загружаем конфигурацию
+source $CONFIG_DIR/server.conf
+
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] $1" >> $LOG_DIR/server.log
+}
+
+log "Запускаем QDYNN DNSTT Server..."
+log "Домен: $SERVER_DOMAIN, IP: $EXTERNAL_IP"
+
+mkdir -p $LOG_DIR/clients
+
+cd $INSTALL_DIR
+exec $INSTALL_DIR/bin/dnstt-server \
+    -domain "ns.$SERVER_DOMAIN" \
+    -privkey-file <(echo -n "$PRIVATE_KEY" | xxd -r -p) \
+    -mtu 1280 \
+    -max-clients $MAX_CLIENTS \
+    >> $LOG_DIR/dnstt.log 2>&1 &
+
+echo $! > $PID_FILE
+log "DNSTT Server запущен с PID: $(cat $PID_FILE)"
+
+while kill -0 $(cat $PID_FILE) 2>/dev/null; do
+    sleep 60
+    if [[ $(stat -c%s "$LOG_DIR/dnstt.log" 2>/dev/null || echo 0) -gt 104857600 ]]; then
+        mv $LOG_DIR/dnstt.log $LOG_DIR/dnstt.log.old
+        log "Ротация логов выполнена"
+    fi
+done
+
+log "DNSTT Server процесс завершен"
+EOF
+
+    cat > $INSTALL_DIR/scripts/stop-server.sh << 'EOF'
+#!/bin/bash
+# QDYNN-SERVER Stop Script
+
+LOG_DIR="/var/log/qdynn"
+PID_FILE="/var/run/qdynn-server.pid"
+
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [INFO] $1" >> $LOG_DIR/server.log
+}
+
+if [[ -f $PID_FILE ]]; then
+    PID=$(cat $PID_FILE)
+    if kill -0 $PID 2>/dev/null; then
+        log "Останавливаем DNSTT Server (PID: $PID)..."
+        kill -TERM $PID
+        for i in {1..30}; do
+            if ! kill -0 $PID 2>/dev/null; then
+                log "DNSTT Server остановлен"
+                rm -f $PID_FILE
+                exit 0
+            fi
+            sleep 1
+        done
+        log "Принудительная остановка DNSTT Server..."
+        kill -KILL $PID 2>/dev/null
+        rm -f $PID_FILE
+    else
+        log "PID файл найден, но процесс не активен"
+        rm -f $PID_FILE
+    fi
+else
+    log "PID файл не найден"
+fi
+EOF
+
+    cat > $INSTALL_DIR/scripts/monitor.sh << 'EOF'
+#!/bin/bash
+# QDYNN-SERVER Monitor Script
+
+INSTALL_DIR="/opt/qdynn-server"
+CONFIG_DIR="/etc/qdynn"
+LOG_DIR="/var/log/qdynn"
+
+source $CONFIG_DIR/server.conf
+
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [MONITOR] $1" >> $LOG_DIR/monitor.log
+}
+
+check_dnstt() {
+    if pgrep -f "dnstt-server" > /dev/null; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+check_dns() {
+    nslookup "test.ns.$SERVER_DOMAIN" 127.0.0.1 > /dev/null 2>&1
+    return $?
+}
+
+log_client_stats() {
+    CLIENT_COUNT=$(ss -tuln | grep ":53 " | wc -l)
+    echo "$(date '+%Y-%m-%d %H:%M:%S') Активных клиентов: $CLIENT_COUNT" >> $LOG_DIR/clients.log
+}
+
+log "Запуск мониторинга QDYNN Server"
+while true; do
+    if check_dnstt; then
+        log_client_stats
+    else
+        log "КРИТИЧНО: DNSTT сервер не отвечает!"
+    fi
+    sleep 300
+done
+EOF
+
+    cat > $INSTALL_DIR/scripts/update.sh << 'EOF'
+#!/bin/bash
+# QDYNN-SERVER Update Script (delegates to remote script)
+curl -fsSL https://raw.githubusercontent.com/Stepan163s/qdynn-server/main/update.sh | bash
+EOF
+
+    chmod +x $INSTALL_DIR/scripts/*.sh
+    chown -R qdynn:qdynn "$INSTALL_DIR/scripts"
+    log_success "Скрипты созданы локально"
+}
 # Проверка и установка Go (если отсутствует или версия ниже минимальной)
 ensure_go() {
     local has_go=0
@@ -380,7 +517,18 @@ finalize_installation() {
     log_info "Завершаем установку..."
     
     # Создаем скрипты
-    $INSTALL_DIR/scripts/create-scripts.sh
+    if [[ -x "$INSTALL_DIR/scripts/create-scripts.sh" ]]; then
+        $INSTALL_DIR/scripts/create-scripts.sh
+    else
+        # Пытаемся скачать ещё раз и выполнить
+        fetch_scripts || true
+        if [[ -x "$INSTALL_DIR/scripts/create-scripts.sh" ]]; then
+            $INSTALL_DIR/scripts/create-scripts.sh
+        else
+            # Резервная генерация
+            generate_runtime_scripts
+        fi
+    fi
     
     # Устанавливаем права
     chown -R qdynn:qdynn $INSTALL_DIR
